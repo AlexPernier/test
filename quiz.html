@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz with Timer and Random Order</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        #quiz-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .question {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="quiz-container">
+        <div id="question1" class="question">
+            <h2>Question 1</h2>
+            <p>What is the capital of France?</p>
+            <input type="radio" name="q1" value="paris"> Paris<br>
+            <input type="radio" name="q1" value="london"> London<br>
+            <input type="radio" name="q1" value="berlin"> Berlin<br>
+            <button onclick="nextQuestion()">Next</button>
+        </div>
+
+        <div id="question2" class="question">
+            <h2>Question 2</h2>
+            <p>What is the largest mammal?</p>
+            <input type="radio" name="q2" value="elephant"> Elephant<br>
+            <input type="radio" name="q2" value="bluewhale"> Blue Whale<br>
+            <input type="radio" name="q2" value="giraffe"> Giraffe<br>
+            <button onclick="nextQuestion()">Next</button>
+        </div>
+
+        <div id="question3" class="question">
+            <h2>Question 3</h2>
+            <p>What is the capital of Japan?</p>
+            <input type="radio" name="q3" value="beijing"> Beijing<br>
+            <input type="radio" name="q3" value="seoul"> Seoul<br>
+            <input type="radio" name="q3" value="tokyo"> Tokyo<br>
+            <button onclick="showResults()">Submit</button>
+        </div>
+
+        <div id="results" class="question">
+            <h2>Results</h2>
+            <p id="result-text"></p>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        let timer;
+        let shuffledQuestions;
+
+        // Define questions and answers
+        const questions = [
+            {
+                question: "What is the capital of France?",
+                options: ["Paris", "London", "Berlin"],
+                correctAnswer: "Paris"
+            },
+            {
+                question: "What is the largest mammal?",
+                options: ["Elephant", "Blue Whale", "Giraffe"],
+                correctAnswer: "Blue Whale"
+            },
+            {
+                question: "What is the capital of Japan?",
+                options: ["Beijing", "Seoul", "Tokyo"],
+                correctAnswer: "Tokyo"
+            }
+        ];
+
+        function shuffleQuestions() {
+            let currentIndex = questions.length, randomIndex;
+
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+
+                [questions[currentIndex], questions[randomIndex]] = [
+                    questions[randomIndex], questions[currentIndex]];
+            }
+        }
+
+        document.getElementById('question1').style.display = 'block';
+        shuffleQuestions();
+        startTimer();
+
+        function startTimer() {
+            let timeLeft = 10; // Set the time limit for each question (in seconds)
+            timer = setInterval(function () {
+                document.getElementById('timer').innerHTML = timeLeft + " seconds remaining";
+                timeLeft--;
+
+                if (timeLeft < 0) {
+                    clearInterval(timer);
+                    nextQuestion();
+                }
+            }, 1000);
+        }
+
+        function nextQuestion() {
+            shuffleQuestions();
+            clearInterval(timer);
+            document.getElementById('question' + currentQuestion).style.display = 'none';
+            currentQuestion++;
+
+            if (currentQuestion > 3) {
+                showResults();
+            } else {
+                document.getElementById('question' + currentQuestion).style.display = 'block';
+                startTimer();
+            }
+        }
+
+        function showResults() {
+            clearInterval(timer);
+            let resultText = "";
+            const answers = questions.map(q => q.correctAnswer);
+
+            for (let i = 1; i <= answers.length; i++) {
+                const userAnswer = document.querySelector('input[name="q' + i + '"]:checked');
+                if (userAnswer) {
+                    if (userAnswer.value === answers[i - 1]) {
+                        resultText += "Question " + i + ": Correct!<br>";
+                    } else {
+                        resultText += "Question " + i + ": Incorrect.<br>";
+                    }
+                } else {
+                    resultText += "Question " + i + ": Not answered.<br>";
+                }
+            }
+
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('result-text').innerHTML = resultText;
+        }
+    </script>
+
+</body>
+
+</html>
